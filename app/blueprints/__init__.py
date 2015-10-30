@@ -28,8 +28,8 @@ def post(data, validation):
     req = loads(request.data) if request.data else {}
     errors = validation(req)
     if errors:
-        print '\n'.join(errors)
-        return dumps({'error':'\n'.join(errors)}), 400
+        print errors
+        return dumps({'error':errors}), 400
     
     data.set(req['id'], req)
     
