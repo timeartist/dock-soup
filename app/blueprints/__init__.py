@@ -1,6 +1,6 @@
-from json import loads
+from json import loads, dumps
 
-from flask import jsonify, request
+from flask import request
 
 
 def get(ids, data):
@@ -8,16 +8,17 @@ def get(ids, data):
     if ',' in ids:
         print 'multiple'
         _ids = ids.split(',')
-        resp_data = data.get_metadata_multi(_ids)
+        print _ids
+        resp_data = data.get_multi(_ids)
         print resp_data
         if any(resp_data):
-            return jsonify(resp_data)
+            return dumps(resp_data), 200
     else:
         print 'singular'
-        resp_data = data.get_metadata(ids)
+        resp_data = data.get(ids)
         print resp_data
         if resp_data:
-            return jsonify(resp_data)   
+            return dumps(resp_data), 200 
     
     ##error
     return jsonify({'error':'ids not found'}), 404
@@ -28,26 +29,26 @@ def post(data, validation):
     errors = validation(req)
     if errors:
         print '\n'.join(errors)
-        return jsonify({'error':'\n'.join(errors)}), 400
+        return dumps({'error':'\n'.join(errors)}), 400
     
-    data.set_metadata(req['id'], req)
+    data.set(req['id'], req)
     
     req['success'] = True
     
-    return jsonify(req)
+    return dumps(req), 200
 
 
 def put(_id, data):
     req = loads(request.data) if request.data else {}
-    resp_data = data.get_metadata(_id)
+    resp_data = data.get(_id)
     
     if not resp_data:
-        return jsonify({'error':'video not found'}), 404
+        return dumps({'error':'%s not found'%data.name}), 404
     
     resp_data.update(req)
-    data.set_metadata(_id, resp_data)
+    data.set(_id, resp_data)
     
     resp_data['success'] = True
     
-    return jsonify(resp_data)
+    return dumps(resp_data), 200
 

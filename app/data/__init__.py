@@ -1,12 +1,10 @@
-from redis import StrictRedis
+import redis
 
 class Base(object):
     def __init__(self, key_base=None, **kwargs):
-        self.r = StrictRedis(**kwargs)
-        
-        self.key_base = key_base or 'NAMESPACE:%s'  ##Should probably be subclassed
+        self.r = redis.StrictRedis(**kwargs)
+        self.key_base = key_base + ':%s' if key_base else 'NAMESPACE:%s'  ##Should probably be subclassed
         self._get_meta_key = lambda x: self.key_base%x
-
 
     def set(self, key, dict_val):
         self.r.hmset(self._get_meta_key(key), dict_val)
@@ -23,8 +21,6 @@ class Base(object):
             
         return pipe.execute()
         
-    
+        
     def delete(self, key):
         return self.r.delete(self._get_meta_key(key))
-    
-    
