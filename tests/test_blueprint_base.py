@@ -12,10 +12,10 @@ def test(monkeypatch):
     ##Test error handling
     with app.test_request_context(data='{"foo": "bar"}'):
         def return_error_test(data):
-            return ('banana',)
+            return 'banana'
         
         error_result = post(None, return_error_test)
-        assert {u'error': u'banana'} == loads(error_result[0])
+        assert {'error': 'banana'} == loads(error_result[0])
         assert error_result[1] == 400
         
     ##Test add/get
